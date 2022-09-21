@@ -18,71 +18,62 @@ count = function(array,callback){ // counts length of an array
     }
 }
 // if dir content = false, if file content=json data
-dirproc.create = (currdir,newObject,content,callback)=>{// create file or directory if not exists
-                        if(typeof(newObject)==='string'){
-                            words = newObject.trim().split('.');
+dirproc.create = (currdir,Objname,content,callback)=>{// create file or directory if not exists
+                        if(typeof(Objname)==='string'){
+                            //words = newObject.trim().split('.');
 
-                            count(words,(err,count)=>{
-
-                                if(err){
-                                    callback(err);
+                            if(content=='0'){
+                                
+                                if(!fs.existsSync(Objname)){
+                                    fs.mkdirSync(currdir+'/'+Objname);
+                                    callback('Creation of directory path...');
                                 }
                                 else{
-                                    let Objname=words[0];
-                                    if(count===1){ //create file or dir;
-                                        /*callback*/callback('Is directory');
-                                        if(!fs.existsSync(Objname)){
-                                            fs.mkdirSync(currdir+'/'+Objname);
-                                        }
-                                        else{
-                                            callback('Folder already exists')
-                                        }
-                                    }
-                                    else if (count===2){//need some content for the file
-                                        callback('Is file');
-                                        let ext = words[1];
-                                        let file = Objname+'.'+ext;
+                                    callback('Folder already exists')
+                                }
+                            }
+                            else{
 
-                                        fs.readdir(currdir,(err,files)=>{// check if file already exists
-                                            if(!err){
-                                                let Fexist = false;
-                                                 for(let f of files){
-                                                    if(f!=file){
-                                                        continue;
-                                                    }
-                                                    else{
-                                                        Fexist = true;
-                                                        break;
-                                                    } 
-                                                }
-                                                if(!Fexist){
-                                                    
-                                                    fs.appendFile(currdir+'/'+file,content,(err)=>{//appendFile
-                                                        if(err){
-                                                            callback('Cannot create file: '+file);
-                                                        }
-                                                        else{
-                                                            if(file=="Auth.json"){
-                                                                callback('Authentication Completed');
-                                                            }
-                                                            else{
-                                                                callback('Creation of file Completed');
-                                                            }
-                                                            
-                                                        }
-                                                    })
-                                                }
+                                fs.readdir(currdir,(err,files)=>{// check if file already exists
+                                    if(!err){
+
+                                        let Fexist = false;
+
+                                         for(let f of files){
+
+                                            if(f!=file){
+                                                continue;
                                             }
                                             else{
-                                                callback('Something went wrong in checking for the existence of the file');
-                                            }   
-                                        });
+                                                Fexist = true;
+                                                break;
+                                            }
+                                         }
+
+                                         if(!Fexist){
+                                                    
+                                            fs.appendFile(currdir+'/'+Objname,content,(err)=>{//appendFile
+                                                if(err){
+                                                    callback('Cannot create file: '+Objname);
+                                                }
+                                                else{
+                                                    if(Objname=="Auth.json"){
+                                                        callback('Authentication Completed');
+                                                    }
+                                                    else{
+                                                        callback('Creation of entry file... ');
+                                                    }
+                                                    
+                                                }
+                                            });
+                                         }
+                                         else{
+                                            callback('File already exists');
+                                         }
                                     }
-                                    else{
-                                        callback('Something went wrong.Check the name of the path/file you want to create');
-                                    }
-                                }
-                            })
+                                })
+
+                            }
                         }
                         else{
                             callback('Passed wrong format of object.Try again');
